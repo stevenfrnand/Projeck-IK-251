@@ -1,0 +1,628 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRUD Mata Kuliah PBO/OOP</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    margin: 0;
+    background: #f1f5f9;
+    color: #1e293b;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px #00000010;
+    margin-bottom: 20px;
+}
+
+h1, h2 {
+    margin-top: 0;
+}
+
+input, textarea, button {
+    width: 100%;
+    padding: 12px;
+    margin: 7px 0;
+    border-radius: 7px;
+    border: 1px solid #cbd5e1;
+}
+
+button {
+    background: #2563eb;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    opacity: .85;
+}
+
+.btn-danger {
+    background: #dc2626;
+}
+
+.btn-edit {
+    background: #f59e0b;
+}
+
+.btn-secondary {
+    background: #64748b;
+}
+
+.hidden {
+    display: none;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.header button {
+    width: auto;
+    padding: 10px 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th, td {
+    padding: 12px;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: left;
+}
+
+th {
+    background: #eff6ff;
+}
+
+.actions {
+    display: flex;
+    gap: 5px;
+}
+
+.actions button {
+    margin: 0;
+    padding: 8px;
+}
+
+.info {
+    background: #eff6ff;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+#message {
+    color: #dc2626;
+    font-weight: bold;
+}
+
+@media(max-width: 650px) {
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    table {
+        min-width: 650px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- HALAMAN LOGIN -->
+<div id="loginPage" class="card">
+    <h1>Login Pengguna</h1>
+    <p>Aplikasi CRUD Mata Kuliah PBO/OOP</p>
+
+    <label>Username</label>
+    <input type="text" id="loginUsername"
+           placeholder="Masukkan username">
+
+    <label>Password</label>
+    <input type="password" id="loginPassword"
+           placeholder="Masukkan password">
+
+    <button onclick="login()">Login</button>
+
+    <p>Belum punya akun?
+        <a href="#" onclick="showRegister()">Daftar di sini</a>
+    </p>
+
+    <p id="message"></p>
+</div>
+
+<!-- HALAMAN REGISTER -->
+<div id="registerPage" class="card hidden">
+    <h2>Registrasi Akun</h2>
+
+    <label>Username</label>
+    <input type="text" id="regUsername"
+           placeholder="Buat username">
+
+    <label>Password</label>
+    <input type="password" id="regPassword"
+           placeholder="Buat password">
+
+    <button onclick="register()">Daftar</button>
+    <button class="btn-secondary"
+            onclick="showLogin()">Kembali ke Login</button>
+
+    <p id="regMessage"></p>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="hidden">
+
+    <div class="card header">
+        <div>
+            <h1>Dashboard PBO/OOP</h1>
+            <p>Selamat datang, <b id="activeUser"></b></p>
+        </div>
+
+        <button class="btn-danger"
+                onclick="logout()">Logout</button>
+    </div>
+
+    <!-- PROFIL MATA KULIAH -->
+    <div class="card">
+        <h2>Profil Mata Kuliah</h2>
+
+        <div class="info">
+            <p><b>Nama Mata Kuliah:</b>
+            Pemrograman Berorientasi Objek (PBO)</p>
+
+            <p><b>Nama Internasional:</b>
+            Object Oriented Programming (OOP)</p>
+
+            <p><b>Deskripsi:</b>
+            Mata kuliah yang mempelajari konsep
+            pemrograman berbasis objek seperti
+            Class, Object, Inheritance, Encapsulation,
+            Polymorphism, dan Abstraction.</p>
+        </div>
+    </div>
+
+    <!-- FORM CRUD -->
+    <div class="card">
+        <h2 id="formTitle">Tambah Data Mata Kuliah</h2>
+
+        <input type="hidden" id="editId">
+
+        <label>Kode Mata Kuliah</label>
+        <input type="text" id="kode"
+               placeholder="Contoh: IF101">
+
+        <label>Nama Mata Kuliah</label>
+        <input type="text" id="nama"
+               placeholder="Contoh: Pemrograman Berorientasi Objek">
+
+        <label>Jumlah SKS</label>
+        <input type="number" id="sks"
+               placeholder="Contoh: 3" min="1">
+
+        <label>Nama Dosen</label>
+        <input type="text" id="dosen"
+               placeholder="Masukkan nama dosen">
+
+        <label>Deskripsi</label>
+        <textarea id="deskripsi" rows="3"
+                  placeholder="Deskripsi mata kuliah"></textarea>
+
+        <button onclick="saveData()">Simpan Data</button>
+        <button class="btn-secondary hidden"
+                id="cancelEdit"
+                onclick="resetForm()">Batal Edit</button>
+    </div>
+
+    <!-- TABEL DATA -->
+    <div class="card">
+        <h2>Data Mata Kuliah</h2>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Kode</th>
+                        <th>Nama Mata Kuliah</th>
+                        <th>SKS</th>
+                        <th>Dosen</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+
+                <tbody id="dataTable"></tbody>
+            </table>
+        </div>
+
+        <p id="emptyMessage">Belum ada data mata kuliah.</p>
+    </div>
+
+</div>
+</div>
+
+<script>
+
+// ===============================
+// LOCAL STORAGE
+// ===============================
+
+let users = JSON.parse(
+    localStorage.getItem("pbo_users")
+) || [];
+
+let courses = JSON.parse(
+    localStorage.getItem("pbo_courses")
+) || [];
+
+let currentUser = localStorage.getItem("pbo_session");
+
+function saveUsers() {
+    localStorage.setItem(
+        "pbo_users",
+        JSON.stringify(users)
+    );
+}
+
+function saveCourses() {
+    localStorage.setItem(
+        "pbo_courses",
+        JSON.stringify(courses)
+    );
+}
+
+// ===============================
+// NAVIGASI HALAMAN
+// ===============================
+
+function showLogin() {
+    loginPage.classList.remove("hidden");
+    registerPage.classList.add("hidden");
+    dashboard.classList.add("hidden");
+    message.textContent = "";
+}
+
+function showRegister() {
+    loginPage.classList.add("hidden");
+    registerPage.classList.remove("hidden");
+    dashboard.classList.add("hidden");
+}
+
+function showDashboard() {
+    loginPage.classList.add("hidden");
+    registerPage.classList.add("hidden");
+    dashboard.classList.remove("hidden");
+
+    activeUser.textContent = currentUser;
+    renderData();
+}
+
+// ===============================
+// REGISTER
+// ===============================
+
+function register() {
+    let username = regUsername.value.trim();
+    let password = regPassword.value;
+
+    if (!username || !password) {
+        regMessage.textContent =
+            "Username dan password wajib diisi!";
+        return;
+    }
+
+    if (password.length < 6) {
+        regMessage.textContent =
+            "Password minimal 6 karakter!";
+        return;
+    }
+
+    let exists = users.some(
+        user => user.username.toLowerCase() === username.toLowerCase()
+    );
+
+    if (exists) {
+        regMessage.textContent =
+            "Username sudah digunakan!";
+        return;
+    }
+
+    users.push({
+        username: username,
+        password: password
+    });
+
+    saveUsers();
+
+    alert("Registrasi berhasil! Silakan login.");
+
+    regUsername.value = "";
+    regPassword.value = "";
+    regMessage.textContent = "";
+
+    showLogin();
+}
+
+// ===============================
+// LOGIN
+// ===============================
+
+function login() {
+    let username = loginUsername.value.trim();
+    let password = loginPassword.value;
+
+    let user = users.find(
+        item =>
+            item.username === username &&
+            item.password === password
+    );
+
+    if (user) {
+        currentUser = user.username;
+
+        localStorage.setItem(
+            "pbo_session",
+            currentUser
+        );
+
+        showDashboard();
+    } else {
+        message.textContent =
+            "Username atau password salah!";
+    }
+}
+
+// ===============================
+// LOGOUT
+// ===============================
+
+function logout() {
+    localStorage.removeItem("pbo_session");
+    currentUser = null;
+
+    loginUsername.value = "";
+    loginPassword.value = "";
+
+    showLogin();
+}
+
+// ===============================
+// CREATE DAN UPDATE
+// ===============================
+
+function saveData() {
+    let id = editId.value;
+    let kodeValue = kode.value.trim();
+    let namaValue = nama.value.trim();
+    let sksValue = Number(sks.value);
+    let dosenValue = dosen.value.trim();
+    let deskripsiValue = deskripsi.value.trim();
+
+    if (!kodeValue || !namaValue ||
+        !sks.value || !dosenValue) {
+        alert("Silakan lengkapi semua data!");
+        return;
+    }
+
+    if (!Number.isInteger(sksValue) || sksValue < 1) {
+        alert("SKS harus berupa angka minimal 1!");
+        return;
+    }
+
+    let duplicate = courses.some(
+        course =>
+            course.kode.toLowerCase() === kodeValue.toLowerCase() &&
+            String(course.id) !== id
+    );
+
+    if (duplicate) {
+        alert("Kode mata kuliah sudah digunakan!");
+        return;
+    }
+
+    if (id) {
+        let index = courses.findIndex(
+            course => String(course.id) === id
+        );
+
+        if (index !== -1) {
+            courses[index] = {
+                ...courses[index],
+                kode: kodeValue,
+                nama: namaValue,
+                sks: sksValue,
+                dosen: dosenValue,
+                deskripsi: deskripsiValue
+            };
+        }
+
+        alert("Data berhasil diperbarui!");
+
+    } else {
+        courses.push({
+            id: Date.now(),
+            kode: kodeValue,
+            nama: namaValue,
+            sks: sksValue,
+            dosen: dosenValue,
+            deskripsi: deskripsiValue
+        });
+
+        alert("Data berhasil ditambahkan!");
+    }
+
+    saveCourses();
+    resetForm();
+    renderData();
+}
+
+// ===============================
+// READ DATA
+// ===============================
+
+function renderData() {
+    dataTable.innerHTML = "";
+
+    emptyMessage.style.display =
+        courses.length === 0 ? "block" : "none";
+
+    courses.forEach((course, index) => {
+        let tr = document.createElement("tr");
+
+        [
+            index + 1,
+            course.kode,
+            course.nama,
+            course.sks,
+            course.dosen
+        ].forEach(value => {
+            let td = document.createElement("td");
+            td.textContent = value;
+            tr.appendChild(td);
+        });
+
+        let action = document.createElement("td");
+        action.className = "actions";
+
+        let editBtn = document.createElement("button");
+        editBtn.textContent = "Edit";
+        editBtn.className = "btn-edit";
+        editBtn.onclick = () => editData(course.id);
+
+        let deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "Hapus";
+        deleteBtn.className = "btn-danger";
+        deleteBtn.onclick = () => deleteData(course.id);
+
+        action.appendChild(editBtn);
+        action.appendChild(deleteBtn);
+
+        tr.appendChild(action);
+        dataTable.appendChild(tr);
+    });
+}
+
+// ===============================
+// EDIT DATA
+// ===============================
+
+function editData(id) {
+    let course = courses.find(
+        item => item.id === id
+    );
+
+    if (!course) return;
+
+    editId.value = course.id;
+    kode.value = course.kode;
+    nama.value = course.nama;
+    sks.value = course.sks;
+    dosen.value = course.dosen;
+    deskripsi.value = course.deskripsi;
+
+    formTitle.textContent = "Edit Data Mata Kuliah";
+    cancelEdit.classList.remove("hidden");
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
+
+// ===============================
+// DELETE DATA
+// ===============================
+
+function deleteData(id) {
+    let confirmDelete = confirm(
+        "Apakah Anda yakin ingin menghapus data ini?"
+    );
+
+    if (!confirmDelete) return;
+
+    courses = courses.filter(
+        course => course.id !== id
+    );
+
+    saveCourses();
+    renderData();
+
+    if (String(editId.value) === String(id)) {
+        resetForm();
+    }
+
+    alert("Data berhasil dihapus!");
+}
+
+// ===============================
+// RESET FORM
+// ===============================
+
+function resetForm() {
+    editId.value = "";
+    kode.value = "";
+    nama.value = "";
+    sks.value = "";
+    dosen.value = "";
+    deskripsi.value = "";
+
+    formTitle.textContent =
+        "Tambah Data Mata Kuliah";
+
+    cancelEdit.classList.add("hidden");
+}
+
+// ===============================
+// CEK SESSION
+// ===============================
+
+if (currentUser && users.some(
+    user => user.username === currentUser
+)) {
+    showDashboard();
+} else {
+    currentUser = null;
+    localStorage.removeItem("pbo_session");
+    showLogin();
+}
+
+</script>
+
+</body>
+</html>
